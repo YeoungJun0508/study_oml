@@ -58,3 +58,43 @@ pprint(calculator.compute_metrics())
 
 ![image](https://github.com/YeoungJun0508/study_oml/assets/145903037/36c85a25-2f1e-4063-867b-7dacf0e6ee0b)
 
+
+
+모델에 반영하는 코드
+
+```
+from oml.const import PATHS_COLUMN
+from oml.registry.transforms import get_transforms_for_pretrained
+from oml.retrieval.postprocessors.pairwise import PairwiseImagesPostprocessor
+from oml.utils.misc_torch import pairwise_dist
+
+# 1. Let's use feature extractor to get predictions
+extractor = ViTExtractor.from_pretrained("vits16_dino")
+transforms, _ = get_transforms_for_pretrained("vits16_dino")
+
+_, emb_val, _, df_val = inference_on_dataframe(dataset_root, "/content/drive/MyDrive/Colab Notebooks/OML/picture/obj123.csv", extractor, transforms=transforms)
+
+is_query = df_val["is_query"].astype('bool').values
+distances = pairwise_dist(x1=emb_val[is_query], x2=emb_val[~is_query])
+
+print("\nOriginal predictions:\n", torch.topk(distances, dim=1, k=3, largest=False)[1])
+
+# 2. Let's initialise a random pairwise postprocessor to perform re-ranking
+siamese = ConcatSiamese(extractor=extractor, mlp_hidden_dims=[100])  # Note! Replace it with your trained postprocessor
+postprocessor = PairwiseImagesPostprocessor(top_n=3, pairwise_model=siamese, transforms=transforms)
+
+dataset = DatasetQueryGallery(df_val, extra_data={"embeddings": emb_val}, transform=transforms)
+loader = DataLoader(dataset, batch_size=4)
+
+query_paths = df_val[PATHS_COLUMN][is_query].values
+gallery_paths = df_val[PATHS_COLUMN][~is_query].values
+distances_upd = postprocessor.process(distances=distances, queries=query_paths, galleries=gallery_paths)
+
+print("\nPredictions after postprocessing:\n", torch.topk(distances_upd, dim=1, k=3, largest=False)[1])
+```
+
+![image](https://github.com/YeoungJun0508/study_oml/assets/145903037/1e2c9911-d862-4a0c-ae25-8a18bd96e3f6)
+
+
+![Uploading image.png…]()
+
