@@ -96,5 +96,6 @@ print("\nPredictions after postprocessing:\n", torch.topk(distances_upd, dim=1, 
 ![image](https://github.com/YeoungJun0508/study_oml/assets/145903037/1e2c9911-d862-4a0c-ae25-8a18bd96e3f6)
 
 
-![Uploading image.png…]()
+![image](https://github.com/YeoungJun0508/study_oml/assets/145903037/0d09d863-3a7a-40af-b1e0-0fff6f0e3cc3)
+
 
