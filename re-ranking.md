@@ -50,3 +50,11 @@ for batch in valid_loader:
 pprint(calculator.compute_metrics())
 
 ```
+
+
+![image](https://github.com/YeoungJun0508/study_oml/assets/145903037/59aaa6f6-bed8-49fd-a23d-b88de338f9c3)
+
+
+
+![image](https://github.com/YeoungJun0508/study_oml/assets/145903037/36c85a25-2f1e-4063-867b-7dacf0e6ee0b)
+
